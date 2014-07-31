@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e -x
+
+export GOROOT=/usr/local/go
+export PATH=${GOROOT}/bin:${PATH}
+
+export GOPATH_ROOT=$PWD
+
+export GOPATH=${GOPATH_ROOT}
+export PATH=${GOPATH_ROOT}/bin:${PATH}
+
+# set up compile-time $GOPATHs for each component
+export WARDEN_LINUX_GOPATH=${GOPATH_ROOT}
+export LINUX_CIRCUS_GOPATH=${GOPATH_ROOT}
+
+
+$(dirname $0)/drone-test "$@"

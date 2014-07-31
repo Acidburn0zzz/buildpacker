@@ -1,0 +1,13 @@
+---
+image: docker:///cloudfoundry/inigo-ci
+
+params:
+  DEFAULT_EVENTUALLY_TIMEOUT: 15s
+
+run:
+  path: bash
+  args:
+    - '-c'
+    - |
+      cd buildpacker/ &&
+      ./src/github.com/cloudfoundry-incubator/buildpacker/scripts/dev-test-inner "$@"
