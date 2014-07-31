@@ -8,8 +8,12 @@ REPOS="
   github.com/cloudfoundry-incubator/warden-linux
 "
 
+BUILDPACKS="
+  go-buildpack
+"
+
 DEV_GOPATH=$(cd $HOME/go && pwd)
-TMP_GOPATH=/tmp/inigo
+TMP_GOPATH=/tmp/buildpacker
 
 mkdir -p ${TMP_GOPATH}
 
@@ -35,6 +39,12 @@ function copy_to_gopath {
   rsync --del --exclude '.*' --exclude '*.test' -a ${DEV_GOPATH}/src/${1}/ ${TMP_GOPATH}/src/${1}/
 }
 
+function compile_and_copy_buildpack {
+  mkdir -p ${TMP_GOPATH}/buildpacks/${1}
+  ~/workspace/${1}/bin/package offline --use-cache
+  mv ~/workspace/${1}/*.zip ${TMP_GOPATH}/buildpacks/${1}/
+}
+
 # grab and set up our components
 for package in $REPOS; do
   copy_to_gopath $package &
@@ -42,6 +52,12 @@ done
 
 
 rsync --del --exclude '.*' -a ~/workspace/loggregator/ ${TMP_GOPATH}/loggregator/ &
+
+# compile buildpacks
+
+for buildpack in $BUILDPACKS; do
+  compile_and_copy_buildpack $buildpack &
+done
 
 wait
 

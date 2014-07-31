@@ -17,8 +17,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/tedsuo/ifrit"
-
-	"github.com/cloudfoundry-incubator/inigo/inigo_server"
 )
 
 var DEFAULT_EVENTUALLY_TIMEOUT = 15 * time.Second
@@ -113,15 +111,11 @@ func TestVizzini(t *testing.T) {
 		suiteContext.WardenProcess = ifrit.Envoke(wardenRunner)
 		Eventually(wardenRunner.TryDial, 10).ShouldNot(HaveOccurred())
 
-		inigo_server.Start(suiteContext.WardenClient)
-
 		currentTestDescription := CurrentGinkgoTestDescription()
 		fmt.Fprintf(GinkgoWriter, "\n%s\n%s\n\n", strings.Repeat("~", 50), currentTestDescription.FullTestText)
 	})
 
 	AfterEach(func() {
-		inigo_server.Stop(suiteContext.WardenClient)
-
 		suiteContext.WardenProcess.Signal(syscall.SIGKILL)
 		Eventually(suiteContext.WardenProcess.Wait(), 10*time.Second).Should(Receive())
 	})
